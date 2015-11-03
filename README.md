@@ -11,7 +11,7 @@ The heart of the program is a statistical model implemented with [Stan](http://m
 
 The model assumes players' ratings come from some statistical distribution with a mean of zero and standard deviation &sigma;. It puts a lognormal prior on &sigma;, assuming it'll be of order 1. The default distribution is a boring normal distribution, but I've played with a logistic distribution (which makes no obvious difference) and a *t* distribution with 3 degrees of freedom (which allows for a more fat-tailed rating distribution, making a bit of difference at the extremes).
 
-To turn rating differences into expected scores, the model assumes a player or team's chance *p* of scoring the next goal/point is a logistic function of their rating advantage over the opposition. If both sides have equal ratings that chance is of course 50%. To connect this fact to the actual outcome of a game, the model assumes the winner's final score was the number of goals needed to win (e.g. a 7-3 game must have been a first-to-7 game), then treats the loser's score as a negatively binomially distributed variable, where the distribution's parameters are the winner's score and *p*. ([Wikipedia](https://en.wikipedia.org/wiki/Negative_binomial_distribution) expresses the NB distribution's parameters differently to Stan, incidentally, hence the ``(1 - nb_p) / nb_p`` circumlocution in the Stan model.)
+To turn rating differences into expected scores, the model assumes a player or team's chance *p* of scoring the next goal/point is a logistic function of their rating advantage over the opposition. (If both sides have equal ratings that chance is of course 50%.) To connect this fact to the actual outcome of a game, the model assumes the winner's final score was the number of goals needed to win (e.g. a 7-3 game must have been a first-to-7 game), then treats the loser's score as a negatively binomially distributed variable, where the distribution's parameters are the winner's score and *p*. ([Wikipedia](https://en.wikipedia.org/wiki/Negative_binomial_distribution) expresses the NB distribution's parameters differently to Stan, incidentally, hence the ``(1 - nb_p) / nb_p`` circumlocution in the Stan model.)
 
 The effective rating of a team is simply taken to be the sum of its players' ratings. That just seemed like the intuitive way to do it, but I have no rigorous justification for it!
 
@@ -21,11 +21,11 @@ Someone else logs the game results in spreadsheets. I just pull out the results 
 
 ## 3. Mince the data into the format Stan likes.
 
-`extract-from-dump.py` reads `dump.txt` and turns it into `data-from-dump.R`, a score data file Stan can use.
+`extract-from-dump.py` reads `dump.txt` and turns it into `data-from-dump.R`, a score data file in an R-like format the Stan-compiled sampler can use.
 
 ## 4. Fit the model.
 
-Finally the actual `fooscore` sampler runs, reading the results of games from `data-from-dump.R` and recording Bayesian posterior distributions for the players' ratings in `fooscore-out.csv`.
+Finally the actual `fooscore` sampler runs, reading the results of games from `data-from-dump.R` and recording Bayesian posterior distributions for the players' ratings in `fooscore-out.csv`. This typically needs a minute or so.
 
 ## 5. Present the results.
 
