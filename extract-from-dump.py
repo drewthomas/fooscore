@@ -2,8 +2,8 @@
 
 from sys import argv, exit
 
-if len(argv) < 2:
-	print "Usage: " + argv[0] + " [DUMP FILE]"
+if len(argv) < 3:
+	print "Usage: " + argv[0] + " [DUMP FILE] [OUTPUT FILE]"
 	exit(1)
 
 f = open(argv[1], "rb")
@@ -29,10 +29,11 @@ def pull_out_column(name, idx):
 	return name + " <- c(" + col_data + ")\n"
 
 col_names = ("p1t1", "p2t1", "p1t2", "p2t2", "score1", "score2")
-f = open("data-from-dump.R", "wb")
+#f = open("data-from-dump.R", "wb")
+f = open(argv[2], "wb")
 f.write("N <- %u\nP <- %u\n" % (len(games), P))
 for col_idx in range(len(col_names)):
 	f.write(pull_out_column(col_names[col_idx], col_idx))
 f.close()
 
-print len(games), "games and", P, "players extracted into data-from-dump.R"
+print len(games), "games and", P, "players extracted into " + argv[2]

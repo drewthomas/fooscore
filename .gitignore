@@ -1,9 +1,11 @@
-# don't track the Stan-compiled executable model fitter
+# don't track compiled programs
 fooscore
+simulate
 # leave out the Stan-generated model-fitter source code and other auto-junk
 fooscore.cpp
 fooscore.d
 fooscore.hpp
 fooscore.o
-# leave out the multi-megabyte Stan output file
+# leave out multi-megabyte Stan output files
+fauxscore-out.csv
 fooscore-out.csv
