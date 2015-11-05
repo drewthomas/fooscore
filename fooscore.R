@@ -38,9 +38,9 @@ ratis <- ratis[order(ratis$MEAN),]
 
 # Plot people's ratings, then throw in error bars (allowing for the fact
 # that `dotchart` flips the y-direction!).
-dotchart(ratis$MEAN, ratis$FULL, cex=0.8, xlim=c(-0.9, 0.6),
-         xlab="fooscore (with standard error bars)")
-grid()
+dotchart(ratis$MEAN, ratis$FULL, cex=0.77, xlim=c(-0.9, 0.6),
+         xlab="fooscore (with standard error bars)", pch=21, bg="#0000006f")
+abline(h=seq(1, length(ratis[,1]), 4), col="#0000009f", lty="dotted")
 abline(v=seq(-0.9, 1, 0.1), col="#0000004f", lty="dotted")
 abline(v=0, lty="dotted")
 for (i in 1:length(ratis[,1])) {
@@ -69,9 +69,10 @@ abline(h=seq(0, 100, 5), col="#0000004f", lty="dotted")
 
 # Convert people's ratings into probabilities of winning a point, then
 # plot those probabilities.
-dotchart(100 * link(ratis$MEAN), ratis$FULL, cex=0.8, xlim=c(31, 69),
-         xlab="estimated chance of winning a point vs. average player (%)")
-grid()
+dotchart(100 * link(ratis$MEAN), ratis$FULL, cex=0.77, xlim=c(31, 69),
+         xlab="estimated chance of winning a point vs. average player (%)",
+         pch=21, bg="#0000006f")
+abline(h=seq(1, length(ratis[,1]), 4), col="#0000009f", lty="dotted")
 abline(v=seq(30, 70, 5), col="#0000004f", lty="dotted")
 abline(v=50, lty="dotted")
 
