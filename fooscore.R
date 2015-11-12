@@ -1,12 +1,12 @@
 # Read in the model fitting results from the sampler.
-foo <- read.table("fooscore-out.csv", TRUE, ",")
+foo <- read.table("fooscore-out.csv", TRUE, ",", colClasses="numeric")
 num_cols <- dim(foo)[2]
 
 # Pick out the subset of the sampler's output with actual ratings.
 # (Exclude the first 6 columns of `foo`, which give other information
 #  about the sampling process, and `foo`'s last column, which gives
 #  the model's estimate of the rating distribution's dispersion.)
-foos <- foo[, 7:(num_cols-1)]
+foos <- foo[substr(colnames(foo), 1, 6) == "rating"]
 
 # Read in the table mapping IDs to names.
 nams <- read.table("names.dat", FALSE, "\t")
