@@ -13,7 +13,7 @@ nams <- read.table("names.dat", FALSE, "\t")
 colnames(nams) <- c("PL", "SUR", "FORE")
 nams$FULL <- paste(nams$FORE, nams$SUR)
 
-# Estimate ratings and their standard errors from the samplre's output.
+# Estimate ratings and their standard errors from the sampler's output.
 P <- dim(foos)[2]  # number of players
 ratings <- data.frame(PL=1:P, MEAN=apply(foos, 2, mean),
                       SD=apply(foos, 2, sd))
