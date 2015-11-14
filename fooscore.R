@@ -13,9 +13,15 @@ nams <- read.table("names.dat", FALSE, "\t")
 colnames(nams) <- c("PL", "SUR", "FORE")
 nams$FULL <- paste(nams$FORE, nams$SUR)
 
+# Estimate ratings and their standard errors from the samplre's output.
 P <- dim(foos)[2]  # number of players
 ratings <- data.frame(PL=1:P, MEAN=apply(foos, 2, mean),
                       SD=apply(foos, 2, sd))
+
+# Rescale the ratings to Elo-like ratings as well.
+conv_factor <- 400 / log(10)
+ratings$ELOM <- signif(400 + (conv_factor * ratings$MEAN), 3)
+ratings$ELOS <- signif(conv_factor * ratings$SD, 3)
 
 par(las=1, mar=c(4.8, 4, 0.2, 0.2))
 
@@ -38,10 +44,12 @@ ratis <- ratis[order(ratis$MEAN),]
 
 # Plot people's ratings, then throw in error bars (allowing for the fact
 # that `dotchart` flips the y-direction!).
-dotchart(ratis$MEAN, ratis$FULL, cex=0.77, xlim=c(-0.9, 0.6),
+x_ra <- c(min(ratis$MEAN - ratis$SD), max(ratis$MEAN + ratis$SD))
+x_ra <- round(x_ra, 1)
+dotchart(ratis$MEAN, ratis$FULL, cex=0.77, xlim=x_ra,
          xlab="fooscore (with standard error bars)", pch=21, bg="#0000006f")
 abline(h=seq(1, length(ratis[,1]), 4), col="#0000009f", lty="dotted")
-abline(v=seq(-0.9, 1, 0.1), col="#0000004f", lty="dotted")
+abline(v=seq(x_ra[1], x_ra[2], 0.1), col="#0000004f", lty="dotted")
 abline(v=0, lty="dotted")
 for (i in 1:length(ratis[,1])) {
 	xs <- ratis$MEAN[i] - (c(-1, 1) * ratis$SD[i])
@@ -52,6 +60,27 @@ text(-0.5, length(ratis[,1]) - 2,
                      "distribution = " * sig),
                 list(sig=signif(mean(foo$sigma), 3))),
      cex=0.9)
+
+# Plot the ELO-like ratings, also with error bars.
+x_ra <- c(min(ratis$ELOM - ratis$ELOS), max(ratis$ELOM + ratis$ELOS))
+x_ra <- signif(x_ra, 2)
+dotchart(ratis$ELOM, ratis$FULL, cex=0.77, xlim=x_ra,
+         xlab="fooscore on Elo scale (with standard errors)",
+         pch=21, bg="#0000006f")
+abline(h=seq(1, length(ratis[,1]), 4), col="#0000009a", lty="dotted")
+abline(v=seq(x_ra[1], x_ra[2], 10), col="#0000004a", lty="dotted")
+abline(v=0, lty="dotted")
+for (i in 1:length(ratis[,1])) {
+	xs <- ratis$ELOM[i] - (c(-1, 1) * ratis$ELOS[i])
+	arrows(xs[1], i, xs[2], i, length=0.03, angle=90, code=3)
+	if (ratis$ELOM[i] < 400) {
+		text(ratis$ELOM[i] + ratis$ELOS[i] + 15, i,
+		     paste(ratis$ELOM[i], "\u00b1", round(ratis$ELOS[i])), cex=0.77)
+	} else {
+		text(ratis$ELOM[i] - ratis$ELOS[i] - 15, i,
+		     paste(ratis$ELOM[i], "\u00b1", round(ratis$ELOS[i])), cex=0.77)
+	}
+}
 
 # Define the link function the model used to convert someone's rating
 # advantage into their probability of winning a point.
@@ -85,7 +114,8 @@ cat("Normality test p-value: ", shapiro.test(ratis$MEAN)$p.value, "\n")
 #curve(dnorm(x), lty="dashed", add=TRUE)
 #grid()
 
-# Record the fooscores.
+# Rescale the fooscores into Elo-like ratings and record them.
+# Record the fooscores in a file.
 ratis$MEAN <- round(ratis$MEAN, 3)
 ratis$SD <- round(ratis$SD, 3)
 write.table(ratis, "fooscores.dat", sep="\t", row.names=FALSE)
