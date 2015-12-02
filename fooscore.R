@@ -23,7 +23,7 @@ conv_factor <- 400 / log(10)
 ratings$ELOM <- signif(400 + (conv_factor * ratings$MEAN), 3)
 ratings$ELOS <- signif(conv_factor * ratings$SD, 3)
 
-par(las=1, mar=c(4.8, 4, 0.2, 0.2))
+par(las=1, mar=c(4.8, 4, 0.2, 0.6))
 
 ## Overview of the model fitting results: means and standard deviations
 ## of sampled ratings.
@@ -42,12 +42,19 @@ ratings <- merge(ratings, nams[, c(1,4)])
 ratis <- ratings[ratings$SD < (0.8 * mean(foo$sigma)),]
 ratis <- ratis[order(ratis$MEAN),]
 
+# `dotchart` wrapper function to produce nicer dot plots.
+dochart <- function(...)
+{
+	dotchart(..., pch=21, bg="#0000006f", lcolor="#0000002f")
+	abline(h=seq(1, length(ratis[,1]), 4), col="#0000009f", lty="dotted")
+}
+
 # Plot people's ratings, then throw in error bars (allowing for the fact
-# that `dotchart` flips the y-direction!).
+# that `dotchart` (called via `dochart`) flips the y-direction!).
 x_ra <- c(min(ratis$MEAN - ratis$SD), max(ratis$MEAN + ratis$SD))
 x_ra <- round(x_ra, 1)
-dotchart(ratis$MEAN, ratis$FULL, cex=0.77, xlim=x_ra,
-         xlab="fooscore (with standard error bars)", pch=21, bg="#0000006f")
+dochart(ratis$MEAN, ratis$FULL, cex=0.77, xlim=x_ra,
+        xlab="fooscore (with standard error bars)")
 abline(h=seq(1, length(ratis[,1]), 4), col="#0000009f", lty="dotted")
 abline(v=seq(x_ra[1], x_ra[2], 0.1), col="#0000004f", lty="dotted")
 abline(v=0, lty="dotted")
@@ -64,20 +71,19 @@ text(-0.5, length(ratis[,1]) - 2,
 # Plot the ELO-like ratings, also with error bars.
 x_ra <- c(min(ratis$ELOM - ratis$ELOS), max(ratis$ELOM + ratis$ELOS))
 x_ra <- signif(x_ra, 2)
-dotchart(ratis$ELOM, ratis$FULL, cex=0.77, xlim=x_ra,
-         xlab="fooscore on Elo scale (with standard errors)",
-         pch=21, bg="#0000006f")
+dochart(ratis$ELOM, ratis$FULL, cex=0.77, xlim=x_ra,
+        xlab="fooscore on Elo scale (with standard errors)")
 abline(h=seq(1, length(ratis[,1]), 4), col="#0000009a", lty="dotted")
 abline(v=seq(x_ra[1], x_ra[2], 10), col="#0000004a", lty="dotted")
 abline(v=0, lty="dotted")
 for (i in 1:length(ratis[,1])) {
 	xs <- ratis$ELOM[i] - (c(-1, 1) * ratis$ELOS[i])
-	arrows(xs[1], i, xs[2], i, length=0.03, angle=90, code=3)
+	arrows(xs[1], i, xs[2], i, length=0.02, angle=90, code=3)
 	if (ratis$ELOM[i] < 400) {
-		text(ratis$ELOM[i] + ratis$ELOS[i] + 15, i,
+		text(ratis$ELOM[i] + ratis$ELOS[i] + 16, i,
 		     paste(ratis$ELOM[i], "\u00b1", round(ratis$ELOS[i])), cex=0.77)
 	} else {
-		text(ratis$ELOM[i] - ratis$ELOS[i] - 15, i,
+		text(ratis$ELOM[i] - ratis$ELOS[i] - 16, i,
 		     paste(ratis$ELOM[i], "\u00b1", round(ratis$ELOS[i])), cex=0.77)
 	}
 }
@@ -98,9 +104,8 @@ abline(h=seq(0, 100, 5), col="#0000004f", lty="dotted")
 
 # Convert people's ratings into probabilities of winning a point, then
 # plot those probabilities.
-dotchart(100 * link(ratis$MEAN), ratis$FULL, cex=0.77, xlim=c(31, 69),
-         xlab="estimated chance of winning a point vs. average player (%)",
-         pch=21, bg="#0000006f")
+dochart(100 * link(ratis$MEAN), ratis$FULL, cex=0.77, xlim=c(31, 69),
+        xlab="estimated chance of winning a point vs. average player (%)")
 abline(h=seq(1, length(ratis[,1]), 4), col="#0000009f", lty="dotted")
 abline(v=seq(30, 70, 5), col="#0000004f", lty="dotted")
 abline(v=50, lty="dotted")
